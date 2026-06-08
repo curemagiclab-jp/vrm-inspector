@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vrm-inspector/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>vrm-inspector — VRChat rank & license checker</title>
+    <meta
+      name="description"
+      content="Drop a .vrm to see triangles, texture VRAM, bones, blendshapes, license, and its VRChat performance rank (PC & Quest). 100% client-side."
+    />
+    <script type="module" crossorigin src="/vrm-inspector/assets/index-DLd4h9U3.js"></script>
+    <link rel="stylesheet" crossorigin href="/vrm-inspector/assets/index-CRVGcjeZ.css">
+  </head>
+  <body>
+    <div id="app">
+      <header id="topbar">
+        <div class="brand">
+          <strong>vrm-inspector</strong>
+          <span class="tagline">100% client-side · your file is never uploaded</span>
+        </div>
+        <div class="topbar-actions">
+          <select id="sample" title="Load a bundled sample VRM">
+            <option value="">Sample VRM ▾</option>
+            <option value="MODEL_V0.vrm">Sample — VRM 0.x</option>
+            <option value="MODEL_V1.vrm">Sample — VRM 1.0</option>
+          </select>
+          <label class="btn" for="file">Open .vrm</label>
+          <input id="file" type="file" accept=".vrm" hidden />
+          <a class="btn ghost" id="github" href="https://github.com/" target="_blank" rel="noopener">GitHub ⭐</a>
+        </div>
+      </header>
+
+      <main id="main">
+        <section id="viewport">
+          <div id="canvas-host"></div>
+          <div id="dropzone" class="dropzone">
+            <div class="dz-inner">
+              <p class="dz-title">Drop a <code>.vrm</code> here</p>
+              <p class="dz-sub">or use “Open .vrm” / a sample — nothing leaves your browser</p>
+            </div>
+          </div>
+          <div id="progress" hidden>
+            <div class="spinner"></div>
+            <span class="ptext"></span>
+          </div>
+        </section>
+
+        <aside id="panel">
+          <div id="report" class="placeholder">Drop a <code>.vrm</code> to inspect…</div>
+        </aside>
+      </main>
+    </div>
+  </body>
+</html>
