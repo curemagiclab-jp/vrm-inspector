@@ -99,3 +99,108 @@ MIT
 ---
 
 Topics: `vrm` `vrchat` `vroid` `three-vrm` `vtuber` `avatar`
+
+---
+---
+
+# vrm-inspector（日本語）
+
+> `.vrm` ファイルをドロップするだけ。三角形数・テクスチャVRAM・ボーン・ブレンドシェイプ・ライセンスを、ブラウザ内で即座に表示。**アップロードなし、100% クライアントサイド。**
+
+`vrm-inspector` は単なる VRM ビューアではなく、**最適化チェッカー**です。あらゆるアバターの **VRChat パフォーマンスランク**（PC *および* Quest）を見積もり、ライセンスを一目で可視化します。しかもファイルはどこにも送信されません。
+
+<!-- TODO: ここに demo.gif を追加（3Dモデルの回転 + 色分けされたメトリクスパネル） -->
+
+**▶ 試す:** https://curemagiclab-jp.github.io/vrm-inspector/
+
+![stars](https://img.shields.io/github/stars/curemagiclab-jp/vrm-inspector?style=social)
+![license](https://img.shields.io/github/license/curemagiclab-jp/vrm-inspector)
+
+---
+
+## なぜ作ったか
+
+- **即座に。** `.vrm` をページにドラッグするだけ。インストール不要、5秒で数値が見える。
+- **プライベート。** ファイルはブラウザの外に出ません — 100% クライアントサイド、何もアップロードしません。
+- **実際の悩みを解決。** VRChat の「重いアバター」警告、BOOTH での購入前スペック確認、VTuber アプリの互換性チェック。
+
+## ユースケース
+
+1. **BOOTH で購入する前に** — 支払う前に、三角形数 / テクスチャVRAM / ボーン、そしてライセンス（商用利用は？改変は？再配布は？）を確認。
+2. **VRChat アバターの最適化** — どの指標がランクを下げているのかを、PC *と* より厳しい Quest の両方で一目で把握。
+3. **VRoid で作ったモデルの確認** — 妥当なパフォーマンス帯に収まっているか、ライセンスが意図どおり設定されているかを確認。
+
+## 表示する項目
+
+| 指標 | 取得元 |
+|---|---|
+| 三角形数 | 全メッシュの `geometry.index` の合計 |
+| テクスチャメモリ（VRAM見積もり） | `w × h × 4 bytes × 約4/3`（ミップマップ）の合計 |
+| テクスチャ数 & 解像度 | glTF images |
+| マテリアル | glTF materials |
+| ボーン | humanoid + ノードツリー内のボーン |
+| ブレンドシェイプ（表情） | モーフターゲット / VRM expressions |
+| スプリングボーン | VRM springBone 定義 |
+| ライセンス / メタ | VRM メタ（作者、商用 / 改変 / 再配布 / クレジット） |
+| VRM バージョン | glTF extensions による `0.x` または `1.0` 判定 |
+
+### 誠実さに関する注記（表示*しない*もの）
+
+VRChat のランクは Unity 側のアバター（GameObject / Component）で算出されます。**PhysBone、マテリアルスロット（レンダラ単位）、Animator、Contacts、Constraints は `.vrm` ファイル内には存在しません**。そのため、これらは意図的に **表示しません**。パフォーマンス見積もりはメッシュ / テクスチャ / ボーンの指標のみを対象とします。
+
+> ⚠️ テクスチャVRAM は **上限見積もり** です — 圧縮（DXT/BCn、KTX2）を無視しているため、実際のエンジン内の値は通常これより小さくなります。
+
+## VRChat パフォーマンスランク
+
+総合ランクは三角形数・テクスチャメモリ・ボーンのうち **最も悪い** ものになります（公式の閾値）:
+
+### PC
+| 指標 | Excellent | Good | Medium | Poor | Very Poor |
+|---|---|---|---|---|---|
+| 三角形数 | ≤32,000 | ≤70,000 | ≤70,000 | ≤70,000 | >70,000 |
+| テクスチャメモリ | ≤40 MB | ≤75 MB | ≤110 MB | ≤150 MB | >150 MB |
+| ボーン | ≤75 | ≤150 | ≤256 | ≤400 | >400 |
+
+### Quest / モバイル
+| 指標 | Excellent | Good | Medium | Poor | Very Poor |
+|---|---|---|---|---|---|
+| 三角形数 | ≤7,500 | ≤10,000 | ≤15,000 | ≤20,000 | >20,000 |
+| テクスチャメモリ | ≤10 MB | ≤18 MB | ≤25 MB | ≤40 MB | >40 MB |
+| ボーン | ≤75 | ≤90 | ≤150 | ≤150 | >150 |
+
+## ローカルでの実行
+
+アプリは [`vrm-inspector/`](vrm-inspector/) サブフォルダにあります。
+
+```bash
+cd vrm-inspector
+npm install
+npm run dev       # Vite 開発サーバ
+npm run build     # 本番ビルド
+npm run preview   # ビルド結果のプレビュー
+npm run test      # Vitest（純ロジック: analyze / rank / license）
+```
+
+> **GitHub Pages:** `vite.config.ts` で `base: '/vrm-inspector/'` を設定しています。別のリポジトリ名でフォークする場合は、それに合わせて変更しないとページが真っ白になります。
+
+## 技術スタック
+
+- [three.js](https://threejs.org/) r180
+- [@pixiv/three-vrm](https://github.com/pixiv/three-vrm) v3（VRM 0.x **および** 1.0）
+- Vite + TypeScript、Vitest でテスト
+
+## ロードマップ
+
+- KTX2 / Basis 圧縮を考慮した VRAM 見積もり（エンジン内の値により近づける）
+- マテリアルごとの内訳
+- レポートのコピー / 共有用 PNG エクスポート
+
+コントリビューション歓迎 — オープンな issue を参照してください（good-first-issue がタグ付けされています）。
+
+## ライセンス
+
+MIT
+
+---
+
+Topics: `vrm` `vrchat` `vroid` `three-vrm` `vtuber` `avatar`
