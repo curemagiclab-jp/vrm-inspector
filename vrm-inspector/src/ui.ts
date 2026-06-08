@@ -2,6 +2,7 @@
 import type { AnalysisResult } from './analyze';
 import { type PlatformResult, type RankIndex, rankName } from './rank';
 import type { NormalizedLicense, Permission } from './license';
+import { t } from './i18n';
 
 // VRChat-style rank colors: Excellent=blue, Good=green, Medium=yellow, Poor=orange, Very Poor=red.
 export const RANK_COLORS: Record<RankIndex, string> = {
@@ -73,60 +74,60 @@ export function renderReport(
   container.classList.remove('placeholder');
   container.innerHTML = `
     <section class="card summary">
-      <h3>SUMMARY</h3>
+      <h3>${t('summary')}</h3>
       <div class="rank-line"><span>PC</span>${rankBadge(pc.overall)}</div>
       <div class="rank-line"><span>Quest</span>${rankBadge(quest.overall)}</div>
-      <p class="caveat">⚠️ Mesh / texture / bone metrics only. PhysBones, material slots and other Unity-side components are not included.</p>
+      <p class="caveat">${t('caveat')}</p>
     </section>
 
     <section class="card">
-      <h3>GEOMETRY</h3>
-      ${metricRow('Triangles', fmt(a.triangles), worst(pc.triangles, quest.triangles))}
-      ${metricRow('Bones', fmt(a.bones), worst(pc.bones, quest.bones))}
+      <h3>${t('geometry')}</h3>
+      ${metricRow(t('triangles'), fmt(a.triangles), worst(pc.triangles, quest.triangles))}
+      ${metricRow(t('bones'), fmt(a.bones), worst(pc.bones, quest.bones))}
     </section>
 
     <section class="card">
-      <h3>TEXTURES</h3>
-      ${metricRow('VRAM (est. upper bound)', mb(a.textureMemoryMB), worst(pc.textureMemory, quest.textureMemory))}
-      ${plainRow('Textures', fmt(a.textureCount))}
+      <h3>${t('textures')}</h3>
+      ${metricRow(t('vram'), mb(a.textureMemoryMB), worst(pc.textureMemory, quest.textureMemory))}
+      ${plainRow(t('texturesLabel'), fmt(a.textureCount))}
       <div class="chips">${resChips || '<span class="muted">—</span>'}</div>
     </section>
 
     <section class="card">
-      <h3>MATERIALS / EXPRESSIONS</h3>
-      ${plainRow('Materials', fmt(a.materials))}
-      ${plainRow('Blendshapes', fmt(a.expressionCount))}
-      ${plainRow('SpringBones', fmt(a.springBones))}
+      <h3>${t('materialsExpressions')}</h3>
+      ${plainRow(t('materials'), fmt(a.materials))}
+      ${plainRow(t('blendshapes'), fmt(a.expressionCount))}
+      ${plainRow(t('springBones'), fmt(a.springBones))}
     </section>
 
     <section class="card">
-      <h3>LICENSE <span class="muted">(VRM ${lic.specVersion})</span></h3>
-      ${plainRow('Author', escapeHtml(lic.author) || '<span class="muted">—</span>')}
-      ${plainRow('Allowed users', lic.allowedUser)}
-      <div class="metric"><span class="m-label">Commercial</span>${permIcon(lic.commercialUsage)}</div>
-      <div class="metric"><span class="m-label">Modification</span>${permIcon(lic.modification)}</div>
-      <div class="metric"><span class="m-label">Redistribution</span>${permIcon(lic.redistribution)}</div>
-      <div class="metric"><span class="m-label">Violent / Sexual</span><span class="m-value">${permIcon(lic.violentUsage)} / ${permIcon(lic.sexualUsage)}</span></div>
-      ${plainRow('Credit', creditLabel(lic.creditNotation))}
-      ${lic.licenseUrl ? `<div class="metric"><a href="${escapeHtml(lic.licenseUrl)}" target="_blank" rel="noopener">License details ↗</a></div>` : ''}
+      <h3>${t('license')} <span class="muted">(VRM ${lic.specVersion})</span></h3>
+      ${plainRow(t('author'), escapeHtml(lic.author) || '<span class="muted">—</span>')}
+      ${plainRow(t('allowedUsers'), lic.allowedUser)}
+      <div class="metric"><span class="m-label">${t('commercial')}</span>${permIcon(lic.commercialUsage)}</div>
+      <div class="metric"><span class="m-label">${t('modification')}</span>${permIcon(lic.modification)}</div>
+      <div class="metric"><span class="m-label">${t('redistribution')}</span>${permIcon(lic.redistribution)}</div>
+      <div class="metric"><span class="m-label">${t('violentSexual')}</span><span class="m-value">${permIcon(lic.violentUsage)} / ${permIcon(lic.sexualUsage)}</span></div>
+      ${plainRow(t('credit'), creditLabel(lic.creditNotation))}
+      ${lic.licenseUrl ? `<div class="metric"><a href="${escapeHtml(lic.licenseUrl)}" target="_blank" rel="noopener">${t('licenseDetails')}</a></div>` : ''}
     </section>
 
     <section class="card">
-      ${plainRow('File', escapeHtml(data.fileName))}
-      ${plainRow('Size', mb(data.fileSizeMB))}
+      ${plainRow(t('file'), escapeHtml(data.fileName))}
+      ${plainRow(t('size'), mb(data.fileSizeMB))}
     </section>
 
     <div class="actions-row">
-      <button id="copy-btn" class="btn">Copy report</button>
-      <button id="export-btn" class="btn">Export PNG</button>
+      <button id="copy-btn" class="btn">${t('copyReport')}</button>
+      <button id="export-btn" class="btn">${t('exportPng')}</button>
     </div>
   `;
 
   const copyBtn = container.querySelector<HTMLButtonElement>('#copy-btn')!;
   copyBtn.addEventListener('click', async () => {
     await navigator.clipboard.writeText(buildReportText(data));
-    copyBtn.textContent = 'Copied ✓';
-    setTimeout(() => (copyBtn.textContent = 'Copy report'), 1500);
+    copyBtn.textContent = t('copied');
+    setTimeout(() => (copyBtn.textContent = t('copyReport')), 1500);
   });
   container
     .querySelector<HTMLButtonElement>('#export-btn')!
@@ -134,7 +135,7 @@ export function renderReport(
 }
 
 function creditLabel(c: NormalizedLicense['creditNotation']): string {
-  return c === 'required' ? 'Required' : c === 'unnecessary' ? 'Not required' : '—';
+  return c === 'required' ? t('creditRequired') : c === 'unnecessary' ? t('creditNotRequired') : '—';
 }
 
 /** Plain-text report for the clipboard (SNS-friendly). */

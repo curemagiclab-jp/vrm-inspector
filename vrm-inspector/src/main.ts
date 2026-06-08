@@ -4,6 +4,21 @@ import { analyze } from './analyze';
 import { evaluate, PC, QUEST } from './rank';
 import { parseLicense } from './license';
 import { renderReport } from './ui';
+import { lang, t } from './i18n';
+
+// --- Localize the static page chrome before anything else renders ---
+function applyStaticI18n(): void {
+  document.documentElement.lang = lang;
+  document.title = t('docTitle');
+  document
+    .querySelector<HTMLMetaElement>('meta[name="description"]')
+    ?.setAttribute('content', t('docDescription'));
+  document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
+    const key = el.dataset.i18n as Parameters<typeof t>[0] | undefined;
+    if (key) el.innerHTML = t(key);
+  });
+}
+applyStaticI18n();
 
 const host = document.querySelector<HTMLElement>('#canvas-host')!;
 const reportEl = document.querySelector<HTMLElement>('#report')!;
@@ -25,7 +40,7 @@ function setProgress(message: string | null): void {
 }
 
 async function inspect(buffer: ArrayBuffer, fileName: string, fileSize: number): Promise<void> {
-  setProgress(`Parsing ${fileName}…`);
+  setProgress(t('parsing').replace('{file}', fileName));
   try {
     const { gltf, vrm } = await viewer.load(buffer);
     const a = analyze(gltf, vrm);
@@ -51,7 +66,7 @@ async function inspect(buffer: ArrayBuffer, fileName: string, fileSize: number):
     );
   } catch (err) {
     reportEl.classList.add('placeholder');
-    reportEl.textContent = `⚠️ ${(err as Error).message ?? 'Failed to load this file.'}`;
+    reportEl.textContent = `⚠️ ${(err as Error).message ?? t('errLoad')}`;
   } finally {
     setProgress(null);
   }
@@ -68,7 +83,7 @@ function exportPng(fileName: string): void {
 async function loadFile(file: File): Promise<void> {
   if (!file.name.toLowerCase().endsWith('.vrm')) {
     reportEl.classList.add('placeholder');
-    reportEl.textContent = '⚠️ Please drop a .vrm file.';
+    reportEl.textContent = t('errNotVrm');
     return;
   }
   const buffer = await file.arrayBuffer();
@@ -77,10 +92,10 @@ async function loadFile(file: File): Promise<void> {
 
 async function loadSample(path: string): Promise<void> {
   const url = `${import.meta.env.BASE_URL}${path}`;
-  setProgress(`Downloading ${path}…`);
+  setProgress(t('downloading').replace('{file}', path));
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Could not load sample (${res.status}).`);
+    if (!res.ok) throw new Error(`${t('errSample')} (${res.status}).`);
     const buffer = await res.arrayBuffer();
     await inspect(buffer, path, buffer.byteLength);
   } catch (err) {

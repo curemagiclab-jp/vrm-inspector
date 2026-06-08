@@ -15,15 +15,15 @@
       <header id="topbar">
         <div class="brand">
           <strong>vrm-inspector</strong>
-          <span class="tagline">100% client-side · your file is never uploaded</span>
+          <span class="tagline" data-i18n="tagline">100% client-side · your file is never uploaded</span>
         </div>
         <div class="topbar-actions">
           <select id="sample" title="Load a bundled sample VRM">
-            <option value="">Sample VRM ▾</option>
-            <option value="MODEL_V0.vrm">Sample — VRM 0.x</option>
-            <option value="MODEL_V1.vrm">Sample — VRM 1.0</option>
+            <option value="" data-i18n="sampleDefault">Sample VRM ▾</option>
+            <option value="MODEL_V0.vrm" data-i18n="sampleV0">Sample — VRM 0.x</option>
+            <option value="MODEL_V1.vrm" data-i18n="sampleV1">Sample — VRM 1.0</option>
           </select>
-          <label class="btn" for="file">Open .vrm</label>
+          <label class="btn" for="file" data-i18n="openVrm">Open .vrm</label>
           <input id="file" type="file" accept=".vrm" hidden />
           <a class="btn ghost" id="github" href="https://github.com/" target="_blank" rel="noopener">GitHub ⭐</a>
         </div>
@@ -34,8 +34,8 @@
           <div id="canvas-host"></div>
           <div id="dropzone" class="dropzone">
             <div class="dz-inner">
-              <p class="dz-title">Drop a <code>.vrm</code> here</p>
-              <p class="dz-sub">or use “Open .vrm” / a sample — nothing leaves your browser</p>
+              <p class="dz-title" data-i18n="dropTitle">Drop a <code>.vrm</code> here</p>
+              <p class="dz-sub" data-i18n="dropSub">or use “Open .vrm” / a sample — nothing leaves your browser</p>
             </div>
           </div>
           <div id="progress" hidden>
@@ -45,7 +45,7 @@
         </section>
 
         <aside id="panel">
-          <div id="report" class="placeholder">Drop a <code>.vrm</code> to inspect…</div>
+          <div id="report" class="placeholder" data-i18n="placeholder">Drop a <code>.vrm</code> to inspect…</div>
         </aside>
       </main>
     </div>
